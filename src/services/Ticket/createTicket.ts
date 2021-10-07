@@ -28,47 +28,31 @@ import {
   SpinalGraphService,
 } from 'spinal-env-viewer-graph-service';
 import { spinalServiceTicket } from 'spinal-service-ticket';
-import { stringToTimestamp } from '../../utils/DateString';
 import { getStepOrderByApiName } from '../../utils/stepMatching';
-import type { IResultItem } from '../ServiceNow/GetTableDI';
 import { getDomaine } from './getDomaine';
 import { getLocationTicket } from './getLocationTicket';
 import { updateStep } from './updateStep';
 import { updateTicketInfo } from './updateTicketInfo';
 
 export async function createTicket(
-  DI: IResultItem,
+  DI: ITicketInfo,
   contextTicket: SpinalContext<any>,
   contextGeoId: string,
   graph: SpinalGraph<any>
 ): Promise<void> {
   console.group('createTicket');
-  console.debug('createTicket');
-  const locationNode = await getLocationTicket(DI, graph, contextGeoId);
-  const domaine = await getDomaine(contextTicket, DI.category);
-
-  const ticketInfo = {
-    name: DI.short_description,
-    user: { userid: 0, name: DI.sys_created_by },
-    gmaoId: DI.sys_id,
-    priority: DI.priority,
-    description: DI.description,
-    // 27/05/2021 15:31
-    gmaoDateCreation: stringToTimestamp(DI.opened_at, 'YYYY-MM-DD HH:mm:ss ZZ'),
-    subcategory: DI.subcategory,
-    state: DI.state,
-    process: DI.category,
-    room: DI.u_room,
-  };
-  console.debug(ticketInfo);
+  const locationNode = await getLocationTicket(DI.room, graph, contextGeoId);
+  const domaine = await getDomaine(contextTicket, DI.process);
   const ticketId = await spinalServiceTicket.addTicket(
-    ticketInfo,
+    DI,
     domaine.info.id.get(),
     contextTicket.info.id.get(),
     locationNode.info.id.get()
   );
-  if (typeof ticketId !== 'string')
+  if (typeof ticketId !== 'string') {
+    console.groupEnd();
     return console.error('addTicket did not return a string', ticketId);
+  }
   // check if step if default
   const ticketNode = SpinalGraphService.getRealNode(ticketId);
   updateTicketInfo(DI, ticketNode);

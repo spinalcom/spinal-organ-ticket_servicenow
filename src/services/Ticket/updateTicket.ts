@@ -23,20 +23,21 @@
  */
 
 import { SpinalContext, SpinalNode } from 'spinal-env-viewer-graph-service';
-import { IResultItem } from '../ServiceNow/GetTableDI';
 import { updateProcess } from './updateProcess';
 import { updateStep } from './updateStep';
 import { updateTicketInfo } from './updateTicketInfo';
 
 export async function updateTicket(
-  DI: IResultItem,
+  DI: ITicketInfo,
   contextTicket: SpinalContext<any>,
   ticketNode: SpinalNode<any>
-) {
+): Promise<void> {
   console.group('updateTicket');
-  console.debug('updateTicket');
-  const process = await updateProcess(ticketNode, DI.category, contextTicket);
-  if (!process) return console.error('Domaine Not found');
+  const process = await updateProcess(ticketNode, DI.process, contextTicket);
+  if (!process) {
+    console.groupEnd();
+    return console.error('Domaine Not found');
+  }
   await updateStep(ticketNode, DI, contextTicket, process);
   updateTicketInfo(DI, ticketNode);
   console.groupEnd();

@@ -24,7 +24,6 @@
 
 import type { SpinalGraph, SpinalNode } from 'spinal-env-viewer-graph-service';
 import { findOneAsyncPredicate } from '../../utils/findOneNodeUtils';
-import type { IResultItem } from '../ServiceNow/GetTableDI';
 import { getGeoBuiding } from './getGeoBuiding';
 import { getNodeAlias } from './getNodeAlias';
 import { getGeoContext } from './getGeoContext';
@@ -38,7 +37,7 @@ import {
 } from '../../constants';
 
 export async function getLocationTicket(
-  ticket: IResultItem,
+  roomName: string,
   graph: SpinalGraph<any>,
   spatialContextId: string
 ): Promise<SpinalNode<any>> {
@@ -57,7 +56,7 @@ export async function getLocationTicket(
       ],
       async (node: SpinalNode<any>): Promise<boolean> => {
         const attr = await getNodeAlias(node, 'alias_servicenow');
-        return attr && attr.value.get() === ticket.u_room;
+        return attr && attr.value.get() === roomName;
       }
     );
     if (res) return res;

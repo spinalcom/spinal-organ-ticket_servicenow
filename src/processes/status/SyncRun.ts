@@ -38,6 +38,7 @@ import { findTicketInContext } from '../../services/Ticket/findTicketInContext';
 import { getContextTicket } from '../../services/Ticket/getContextTicket';
 import { initContext } from '../../services/Ticket/initContext';
 import { updateTicket } from '../../services/Ticket/updateTicket';
+import { stringToTimestamp } from '../../utils/DateString';
 import { waitFct } from '../../utils/waitFct';
 import type IStatus from './IStatus';
 
@@ -58,22 +59,35 @@ export default class SyncRun implements IStatus {
     );
 
     for (const DI of DIs.result) {
-      await this.createOrUpdateTicket(DI, context);
+      const ticketInfo: ITicketInfo = {
+        name: DI.short_description || DI.number,
+        user: { userid: 0, name: DI.sys_created_by },
+        gmaoId: DI.sys_id,
+        priority: DI.priority,
+        description: DI.description,
+        gmaoDateCreation: stringToTimestamp(
+          DI.opened_at,
+          'YYYY-MM-DD HH:mm:ss ZZ'
+        ),
+        subcategory: DI.subcategory,
+        state: DI.state,
+        process: DI.category,
+        room: DI.u_room,
+      };
+
+      await this.createOrUpdateTicket(ticketInfo, context);
     }
   }
 
   async createOrUpdateTicket(
-    DI: IResultItem,
+    DI: ITicketInfo,
     contextTicket: SpinalContext<any>
   ): Promise<void> {
     // search ticket in context
-    console.debug(
-      moment().format(),
-      'createOrUpdateTicket',
-      DI.sys_id,
-      DI.short_description
-    );
-    const ticketNode = await findTicketInContext(DI.sys_id, contextTicket);
+    console.log(moment().format(), 'createOrUpdateTicket');
+    console.log(DI);
+
+    const ticketNode = await findTicketInContext(DI.gmaoId, contextTicket);
     if (ticketNode) {
       // found ticket
       return updateTicket(DI, contextTicket, ticketNode);
@@ -117,7 +131,7 @@ export default class SyncRun implements IStatus {
     await waitFct(timeout);
     while (true) {
       if (!this.running) break;
-      console.log('start SyncRun loop');
+      console.group('SyncRun loop');
       const before = Date.now();
       try {
         const DIs = await GetTableDI(
@@ -133,6 +147,7 @@ export default class SyncRun implements IStatus {
         const delta = Date.now() - before;
         const timeout = this.config.gmaoSpec.pullInterval.get() - delta;
         await waitFct(timeout);
+        console.groupEnd();
       }
     }
     return 0;

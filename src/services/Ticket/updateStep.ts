@@ -27,13 +27,12 @@ import {
   SpinalGraphService,
   SpinalNode,
 } from 'spinal-env-viewer-graph-service';
-import { IResultItem } from '../ServiceNow/GetTableDI';
 import { spinalServiceTicket } from 'spinal-service-ticket';
 import { getStepNameByApiName } from '../../utils/stepMatching';
 
 export async function updateStep(
   ticketNode: SpinalNode<any>,
-  ticket: IResultItem,
+  ticket: ITicketInfo,
   context: SpinalContext<any>,
   processNode: SpinalNode<any>
 ) {
@@ -56,7 +55,7 @@ export async function updateStep(
       await spinalServiceTicket.addLogToTicket(
         ticketId,
         6,
-        { name: ticket.sys_created_by, userId: 0 },
+        ticket.user,
         stepId,
         step.info.id.get()
       );
