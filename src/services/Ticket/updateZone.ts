@@ -67,16 +67,17 @@ async function getTicketZone(
     return acc;
   }, []);
 }
+
 export async function updateZone(
   DI: ITicketInfo,
   ticketNode: SpinalNode<any>,
   contextGeoId: string,
   graph: SpinalGraph<any>
-) {
+): Promise<void[]> {
   const parents = await getTicketZone(ticketNode);
   const locationNode = await getLocationTicket(DI.room, graph, contextGeoId);
   console.log("locationNode", locationNode.info.name.get());
-  const prom = [];
+  const prom: (() => Promise<void>)[] = [];
   let found = false;
   for (const parent of parents) {
     if (locationNode === parent) {
