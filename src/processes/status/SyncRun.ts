@@ -74,8 +74,10 @@ export default class SyncRun implements IStatus {
         process: DI.category,
         room: DI.u_room,
       };
-
+      console.group('createOrUpdateTicket', ticketInfo.gmaoId, ticketInfo.name);
+      console.log(ticketInfo);
       await this.createOrUpdateTicket(ticketInfo, context);
+      console.groupEnd();
     }
   }
 
@@ -84,9 +86,6 @@ export default class SyncRun implements IStatus {
     contextTicket: SpinalContext<any>
   ): Promise<void> {
     // search ticket in context
-    console.log(moment().format(), 'createOrUpdateTicket');
-    console.log(DI);
-
     const ticketNode = await findTicketInContext(DI.gmaoId, contextTicket);
     if (ticketNode) {
       // found ticket
@@ -126,12 +125,14 @@ export default class SyncRun implements IStatus {
     console.log('start SyncRun');
     this.checkConfig();
     this.running = true;
+    console.group(moment().format(), 'start Init');
     await this.init();
+    console.groupEnd();
     const timeout = this.config.gmaoSpec.pullInterval.get();
     await waitFct(timeout);
     while (true) {
       if (!this.running) break;
-      console.group('SyncRun loop');
+      console.group(moment().format(), 'SyncRun loop');
       const before = Date.now();
       try {
         const DIs = await GetTableDI(
