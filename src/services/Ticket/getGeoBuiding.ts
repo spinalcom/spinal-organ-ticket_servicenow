@@ -22,7 +22,11 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-import type { SpinalGraph, SpinalNode } from 'spinal-env-viewer-graph-service';
+import {
+  SpinalGraph,
+  SpinalGraphService,
+  SpinalNode,
+} from 'spinal-env-viewer-graph-service';
 import { GEO_BUILDING_TYPE, GEO_FIND_BUILDING } from '../../constants';
 import { findOne } from '../../utils/findOneNodeUtils';
 import { getGeoContext } from './getGeoContext';
@@ -33,12 +37,17 @@ export async function getGeoBuiding(
 ): Promise<SpinalNode<any>> {
   const context = await getGeoContext(graph, spatialContextId);
   if (context) {
-    return findOne(
+    const res = await findOne(
       context,
       GEO_FIND_BUILDING,
       (node: SpinalNode<any>): boolean =>
         node.getType()?.get() === GEO_BUILDING_TYPE
     );
+    if (res) {
+      // @ts-ignore
+      SpinalGraphService._addNode(res);
+      return res;
+    }
   }
 }
 

@@ -89,7 +89,13 @@ export default class SyncRun implements IStatus {
     const ticketNode = await findTicketInContext(DI.gmaoId, contextTicket);
     if (ticketNode) {
       // found ticket
-      return updateTicket(DI, contextTicket, ticketNode);
+      return updateTicket(
+        DI,
+        contextTicket,
+        ticketNode,
+        this.config.spatialContextID.get(),
+        this.graph
+      );
     }
     return createTicket(
       DI,

@@ -22,15 +22,22 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-import { SpinalContext, SpinalNode } from 'spinal-env-viewer-graph-service';
+import {
+  SpinalContext,
+  SpinalGraph,
+  SpinalNode,
+} from 'spinal-env-viewer-graph-service';
 import { updateProcess } from './updateProcess';
 import { updateStep } from './updateStep';
 import { updateTicketInfo } from './updateTicketInfo';
+import { updateZone } from './updateZone';
 
 export async function updateTicket(
   DI: ITicketInfo,
   contextTicket: SpinalContext<any>,
-  ticketNode: SpinalNode<any>
+  ticketNode: SpinalNode<any>,
+  contextGeoId: string,
+  graph: SpinalGraph<any>
 ): Promise<void> {
   console.group('updateTicket');
   const process = await updateProcess(ticketNode, DI.process, contextTicket);
@@ -39,6 +46,7 @@ export async function updateTicket(
     return console.error('Domaine Not found');
   }
   await updateStep(ticketNode, DI, contextTicket, process);
+  await updateZone(DI, ticketNode, contextGeoId, graph);
   updateTicketInfo(DI, ticketNode);
   console.groupEnd();
 }

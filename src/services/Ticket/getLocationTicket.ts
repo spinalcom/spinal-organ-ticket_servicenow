@@ -22,7 +22,11 @@
  * <http://resources.spinalcom.com/licenses.pdf>.
  */
 
-import type { SpinalGraph, SpinalNode } from 'spinal-env-viewer-graph-service';
+import {
+  SpinalGraph,
+  SpinalGraphService,
+  SpinalNode,
+} from 'spinal-env-viewer-graph-service';
 import { findOneAsyncPredicate } from '../../utils/findOneNodeUtils';
 import { getGeoBuiding } from './getGeoBuiding';
 import { getNodeAlias } from './getNodeAlias';
@@ -59,7 +63,11 @@ export async function getLocationTicket(
         return attr && attr.value.get() === roomName;
       }
     );
-    if (res) return res;
+    if (res) {
+      // @ts-ignore
+      SpinalGraphService._addNode(res);
+      return res;
+    }
     return getGeoBuiding(graph, spatialContextId);
   }
 }
