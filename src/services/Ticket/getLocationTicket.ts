@@ -32,12 +32,7 @@ import { getGeoBuiding } from './getGeoBuiding';
 import { getNodeAlias } from './getNodeAlias';
 import { getGeoContext } from './getGeoContext';
 import {
-  GEO_CONTEXT_TYPE,
-  GEO_SITE_TYPE,
-  GEO_BUILDING_TYPE,
-  GEO_FLOOR_TYPE,
-  GEO_ZONE_TYPE,
-  GEO_ROOM_TYPE,
+  GEO_FIND_ROOM_BY_CONTEXT,
 } from '../../constants';
 
 export async function getLocationTicket(
@@ -50,14 +45,7 @@ export async function getLocationTicket(
   if (context) {
     const res = await findOneAsyncPredicate(
       context,
-      [
-        GEO_CONTEXT_TYPE,
-        GEO_SITE_TYPE,
-        GEO_BUILDING_TYPE,
-        GEO_FLOOR_TYPE,
-        GEO_ZONE_TYPE,
-        GEO_ROOM_TYPE,
-      ],
+      GEO_FIND_ROOM_BY_CONTEXT,
       async (node: SpinalNode<any>): Promise<boolean> => {
         const attr = await getNodeAlias(node, 'alias_servicenow');
         return attr && attr.value.get() === roomName;

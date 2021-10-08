@@ -71,4 +71,13 @@ export const GEO_RELATIONS = [
   geoConstants.EQUIPMENT_RELATION,
   geoConstants.ZONE_RELATION,
 ];
+
+export const GEO_FIND_ROOM_BY_CONTEXT = [
+  geoConstants.SITE_RELATION,
+  geoConstants.BUILDING_RELATION,
+  geoConstants.FLOOR_RELATION,
+  geoConstants.ZONE_RELATION,
+  geoConstants.ROOM_RELATION,
+];
+
 export const GEOGRAPHIC_TYPES = geoConstants.GEOGRAPHIC_TYPES;

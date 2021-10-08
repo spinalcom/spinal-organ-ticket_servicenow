@@ -75,12 +75,14 @@ export async function updateZone(
 ) {
   const parents = await getTicketZone(ticketNode);
   const locationNode = await getLocationTicket(DI.room, graph, contextGeoId);
+  console.log("locationNode", locationNode.info.name.get());
   const prom = [];
   let found = false;
   for (const parent of parents) {
     if (locationNode === parent) {
       found = true;
     } else {
+      console.log("updateZone delete zone", parent.info.name.get());
       prom.push(
         (): Promise<void> =>
           parent.removeChild(
@@ -92,6 +94,7 @@ export async function updateZone(
     }
   }
   if (!found) {
+    console.log("updateZone ADD zone", locationNode.info.name.get());
     prom.push(
       (): Promise<void> =>
         locationNode
