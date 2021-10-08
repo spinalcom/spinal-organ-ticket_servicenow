@@ -4,3 +4,4 @@ old
 response.json
 build
 tmp.js
+.env
